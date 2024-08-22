@@ -1,14 +1,43 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../components/button.dart';
+import '../components/square_tile.dart';
 import '../components/textfield.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class LoginPage extends StatefulWidget {
+  final Function()? onTap;
+  const LoginPage({
+    super.key,
+    required this.onTap,
+  });
 
   @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  @override
   Widget build(BuildContext context) {
-    final userNameController = TextEditingController();
+    final emailController = TextEditingController();
     final passwordController = TextEditingController();
+
+    void signUserIn() async {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      );
+
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+      Navigator.pop(context);
+    }
 
     EdgeInsets padding = MediaQuery.viewPaddingOf(context);
     double topPadding = padding.top;
@@ -44,7 +73,7 @@ class LoginPage extends StatelessWidget {
                 const SizedBox(height: 24),
                 MyTextField(
                   hintText: 'Email',
-                  controller: userNameController,
+                  controller: emailController,
                   obscureText: false,
                 ),
                 const SizedBox(height: 24),
@@ -55,20 +84,70 @@ class LoginPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        'Forgot password?',
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        'Forgot Password',
                         style: TextStyle(
-                          color: Colors.grey[200],
                           fontSize: 16,
+                          color: Colors.grey[900],
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                )
+                ),
+                const SizedBox(height: 12),
+                MyButton(
+                  onTap: signUserIn,
+                  message: 'Sign In',
+                ),
+                const SizedBox(height: 44),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Or continue with',
+                      style: TextStyle(color: Colors.grey[900], fontSize: 16),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Google Button
+                    SquareTile(imagePath: 'assets/images/google.png'),
+
+                    SizedBox(width: 24),
+                    // Apple Button
+                    SquareTile(imagePath: 'assets/images/apple.png'),
+                  ],
+                ),
+                const SizedBox(height: 52),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Not a member?',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(width: 4),
+                    GestureDetector(
+                      onTap: widget.onTap,
+                      child: Text(
+                        'Register now',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue[800],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
