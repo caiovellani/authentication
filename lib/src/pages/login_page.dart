@@ -1,9 +1,13 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../components/button.dart';
 import '../components/square_tile.dart';
 import '../components/textfield.dart';
+import '../services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   final Function()? onTap;
@@ -115,15 +119,34 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // Google Button
-                    SquareTile(imagePath: 'assets/images/google.png'),
+                    SquareTile(
+                      imagePath: 'assets/images/google.png',
+                      onTap: () => AuthService().signInWithGoogle(),
+                    ),
 
-                    SizedBox(width: 24),
+                    const SizedBox(width: 24),
                     // Apple Button
-                    SquareTile(imagePath: 'assets/images/apple.png'),
+                    SquareTile(
+                      imagePath: 'assets/images/apple.png',
+                      onTap: () {
+                        SignInWithAppleButton(
+                          onPressed: () async {
+                            final credential =
+                                await SignInWithApple.getAppleIDCredential(
+                              scopes: [
+                                AppleIDAuthorizationScopes.email,
+                                AppleIDAuthorizationScopes.fullName,
+                              ],
+                            );
+                            log(credential.toString());
+                          },
+                        );
+                      },
+                    ),
                   ],
                 ),
                 const SizedBox(height: 52),
